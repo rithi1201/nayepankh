@@ -1,0 +1,839 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+--np-sky:#1a6fa8;--np-sky-light:#e8f4fd;--np-sky-mid:#5aa8d8;
+--np-gold:#d4860f;--np-gold-light:#fef3e2;
+--np-green:#2e7d32;--np-green-light:#e8f5e9;
+--np-coral:#c0392b;--np-coral-light:#fdecea;
+--np-surface:var(--color-background-primary);
+--np-bg:var(--color-background-tertiary);
+--np-border:var(--color-border-tertiary);
+--np-text:var(--color-text-primary);
+--np-muted:var(--color-text-secondary);
+}
+#app{width:100%;min-height:600px;background:var(--np-bg);font-family:var(--font-sans);}
+.screen{display:none;flex-direction:column;min-height:600px;}
+.screen.active{display:flex;}
+
+/* STATUS BAR */
+.statusbar{background:var(--np-sky);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;}
+.statusbar span{color:#fff;font-size:12px;font-weight:500;}
+
+/* TOP BAR */
+.topbar{background:var(--np-sky);padding:12px 16px 16px;color:#fff;}
+.topbar h1{font-size:20px;font-weight:500;}
+.topbar p{font-size:12px;opacity:0.85;margin-top:2px;}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;}
+
+/* BOTTOM NAV */
+.bottomnav{background:var(--np-surface);border-top:0.5px solid var(--np-border);display:flex;padding:8px 0 4px;position:sticky;bottom:0;z-index:10;}
+.navitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;transition:opacity 0.15s;}
+.navitem i{font-size:22px;color:var(--np-muted);}
+.navitem span{font-size:10px;color:var(--np-muted);}
+.navitem.active i{color:var(--np-sky);}
+.navitem.active span{color:var(--np-sky);}
+
+/* SCROLLABLE CONTENT */
+.content{flex:1;overflow-y:auto;padding:16px;}
+.content.noPad{padding:0;}
+
+/* CARDS */
+.card{background:var(--np-surface);border-radius:var(--border-radius-lg);border:0.5px solid var(--np-border);padding:16px;margin-bottom:12px;}
+.card-title{font-size:15px;font-weight:500;color:var(--np-text);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--np-muted);}
+
+/* HERO STAT */
+.hero-stats{background:var(--np-sky);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:16px;color:#fff;}
+.hero-stats h2{font-size:13px;opacity:0.85;margin-bottom:10px;font-weight:400;}
+.stat-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.stat-box{background:rgba(255,255,255,0.18);border-radius:var(--border-radius-md);padding:10px;}
+.stat-box .num{font-size:22px;font-weight:500;}
+.stat-box .lbl{font-size:11px;opacity:0.85;margin-top:2px;}
+
+/* PILL BADGE */
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+.badge-sky{background:var(--np-sky-light);color:var(--np-sky);}
+.badge-gold{background:var(--np-gold-light);color:var(--np-gold);}
+.badge-green{background:var(--np-green-light);color:var(--np-green);}
+.badge-coral{background:var(--np-coral-light);color:var(--np-coral);}
+
+/* FORM */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;color:var(--np-muted);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--np-border);background:var(--np-surface);color:var(--np-text);font-size:14px;font-family:var(--font-sans);}
+.field textarea{resize:none;height:80px;}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:13px;background:var(--np-sky);color:#fff;border:none;border-radius:var(--border-radius-md);font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font-sans);}
+.btn-secondary{width:100%;padding:11px;background:transparent;color:var(--np-sky);border:0.5px solid var(--np-sky);border-radius:var(--border-radius-md);font-size:14px;cursor:pointer;font-family:var(--font-sans);margin-top:8px;}
+.btn-sm{padding:7px 16px;background:var(--np-sky);color:#fff;border:none;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;font-family:var(--font-sans);}
+.btn-sm-outline{padding:7px 16px;background:transparent;color:var(--np-sky);border:0.5px solid var(--np-sky);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;font-family:var(--font-sans);}
+
+/* DIVIDER */
+.divider{border:none;border-top:0.5px solid var(--np-border);margin:14px 0;}
+
+/* LIST ROW */
+.list-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--np-border);}
+.list-row:last-child{border-bottom:none;}
+.icon-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* PROGRESS BAR */
+.prog-wrap{background:var(--np-border);border-radius:10px;height:6px;margin-top:8px;}
+.prog-bar{height:6px;border-radius:10px;background:var(--np-sky);}
+
+/* AVATAR */
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--np-sky-light);color:var(--np-sky);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;flex-shrink:0;}
+
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--np-sky);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* SPLASH LOGO */
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:38px;height:38px;background:rgba(255,255,255,0.22);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon i{font-size:22px;color:#fff;}
+
+/* SECTION HEADER */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-hd h3{font-size:15px;font-weight:500;color:var(--np-text);}
+.sec-hd a{font-size:12px;color:var(--np-sky);cursor:pointer;}
+
+/* CAUSE CARD */
+.cause-card{background:var(--np-surface);border-radius:var(--border-radius-lg);border:0.5px solid var(--np-border);overflow:hidden;margin-bottom:12px;}
+.cause-img{height:100px;background:var(--np-sky);display:flex;align-items:center;justify-content:center;}
+.cause-img i{font-size:42px;color:rgba(255,255,255,0.6);}
+.cause-body{padding:12px;}
+
+/* DONATION OPTION */
+.amt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.amt-opt{padding:10px;border:0.5px solid var(--np-border);border-radius:var(--border-radius-md);text-align:center;cursor:pointer;font-size:14px;color:var(--np-text);background:var(--np-surface);transition:background 0.15s;}
+.amt-opt.selected{background:var(--np-sky-light);border-color:var(--np-sky);color:var(--np-sky);font-weight:500;}
+
+/* CERT CARD */
+.cert-card{background:linear-gradient(135deg,#1a6fa8 0%,#0d4a75 100%);border-radius:var(--border-radius-lg);padding:20px;color:#fff;margin-bottom:12px;position:relative;overflow:hidden;}
+.cert-card::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.08);}
+
+/* IMPACT ROW */
+.impact-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.impact-box{background:var(--np-surface);border:0.5px solid var(--np-border);border-radius:var(--border-radius-md);padding:12px;text-align:center;}
+.impact-box .big{font-size:20px;font-weight:500;color:var(--np-text);}
+.impact-box .sm{font-size:11px;color:var(--np-muted);margin-top:2px;}
+
+/* AUTH SCREEN SPECIFIC */
+.auth-header{background:var(--np-sky);padding:32px 24px 24px;text-align:center;color:#fff;}
+.auth-body{flex:1;padding:24px;}
+.tab-row{display:flex;border-bottom:0.5px solid var(--np-border);margin-bottom:20px;}
+.tab-btn{flex:1;padding:10px;background:transparent;border:none;font-size:14px;color:var(--np-muted);cursor:pointer;font-family:var(--font-sans);border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab-btn.active{color:var(--np-sky);border-bottom-color:var(--np-sky);}
+
+/* ACTIVITY FEED */
+.feed-item{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--np-border);}
+.feed-item:last-child{border-bottom:none;}
+.feed-dot{width:8px;height:8px;border-radius:50%;background:var(--np-sky);margin-top:6px;flex-shrink:0;}
+.feed-text{font-size:13px;color:var(--np-text);}
+.feed-time{font-size:11px;color:var(--np-muted);margin-top:2px;}
+</style>
+
+<div id="app">
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1: SPLASH / LOGIN
+═══════════════════════════════════════ -->
+<div id="s-splash" class="screen active" style="flex-direction:column;">
+  <div class="auth-header" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+    <div style="width:72px;height:72px;background:rgba(255,255,255,0.2);border-radius:20px;display:flex;align-items:center;justify-content:center;">
+      <i class="ti ti-feather" style="font-size:38px;color:#fff;" aria-hidden="true"></i>
+    </div>
+    <div>
+      <h1 style="font-size:24px;font-weight:500;">NayePankh</h1>
+      <p style="font-size:13px;opacity:0.85;margin-top:4px;">Foundation — Giving wings to the underprivileged</p>
+    </div>
+  </div>
+  <div class="auth-body">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="authTab('login')">Sign in</button>
+      <button class="tab-btn" id="tab-register" onclick="authTab('register')">Register</button>
+    </div>
+
+    <div id="form-login">
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" value="rithi@example.com"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" value="password123"/>
+      </div>
+      <button class="btn-primary" onclick="doLogin()" style="margin-top:8px;">Sign in</button>
+      <p style="font-size:12px;color:var(--np-muted);text-align:center;margin-top:12px;">
+        New volunteer? <span style="color:var(--np-sky);cursor:pointer;" onclick="authTab('register')">Create account</span>
+      </p>
+    </div>
+
+    <div id="form-register" style="display:none;">
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" placeholder="Your name" id="regName"/>
+      </div>
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="you@example.com" id="regEmail"/>
+      </div>
+      <div class="field">
+        <label>City</label>
+        <input type="text" placeholder="e.g. Kanpur, Coimbatore" id="regCity"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Min. 8 characters" id="regPass"/>
+      </div>
+      <button class="btn-primary" onclick="doRegister()" style="margin-top:8px;">Create account</button>
+    </div>
+
+    <p style="font-size:11px;color:var(--np-muted);text-align:center;margin-top:16px;">
+      UP Govt. Registered NGO · 80G & 12A Certified
+    </p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2: HOME DASHBOARD
+═══════════════════════════════════════ -->
+<div id="s-home" class="screen" style="flex-direction:column;">
+  <div class="statusbar">
+    <span>NayePankh</span>
+    <span><i class="ti ti-bell" style="font-size:14px;vertical-align:-2px;" aria-hidden="true"></i> 2</span>
+  </div>
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="logo-wrap">
+        <div class="logo-icon"><i class="ti ti-feather" aria-hidden="true"></i></div>
+        <div>
+          <p style="font-size:11px;opacity:0.8;">Good morning,</p>
+          <h1 style="font-size:16px;" id="greetName">Volunteer</h1>
+        </div>
+      </div>
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="goScreen('s-profile')">
+        <i class="ti ti-user" style="font-size:18px;color:#fff;" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="hero-stats">
+      <h2><i class="ti ti-chart-bar" style="font-size:14px;vertical-align:-2px;margin-right:4px;" aria-hidden="true"></i> Our collective impact</h2>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="num">2L+</div>
+          <div class="lbl">People helped</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">30K+</div>
+          <div class="lbl">Interns trained</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">500+</div>
+          <div class="lbl">Active volunteers</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">12A/80G</div>
+          <div class="lbl">Certified NGO</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hd">
+      <h3>Active causes</h3>
+      <a onclick="goScreen('s-causes')">See all →</a>
+    </div>
+
+    <div class="cause-card" onclick="goScreen('s-causes')">
+      <div class="cause-img" style="background:#e8f4fd;">
+        <i class="ti ti-book" style="font-size:42px;color:#1a6fa8;" aria-hidden="true"></i>
+      </div>
+      <div class="cause-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <span class="card-title">Free Education Drive</span>
+          <span class="badge badge-sky">Education</span>
+        </div>
+        <p class="card-sub">Providing free tuition and study materials to underprivileged children in UP.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <span style="font-size:12px;color:var(--np-muted);">Goal: ₹1,50,000</span>
+          <span style="font-size:12px;color:var(--np-sky);">₹92,400 raised</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:62%"></div></div>
+      </div>
+    </div>
+
+    <div class="cause-card" onclick="goScreen('s-causes')">
+      <div class="cause-img" style="background:#fef3e2;">
+        <i class="ti ti-apple" style="font-size:42px;color:#d4860f;" aria-hidden="true"></i>
+      </div>
+      <div class="cause-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <span class="card-title">Food for All</span>
+          <span class="badge badge-gold">Nutrition</span>
+        </div>
+        <p class="card-sub">Daily meal distribution for migrant workers and homeless individuals.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <span style="font-size:12px;color:var(--np-muted);">Goal: ₹80,000</span>
+          <span style="font-size:12px;color:var(--np-gold);">₹64,000 raised</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:80%;background:#d4860f;"></div></div>
+      </div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:4px;">
+      <h3>Recent activity</h3>
+    </div>
+    <div class="card" style="padding:12px 16px;">
+      <div class="feed-item">
+        <div class="feed-dot"></div>
+        <div><div class="feed-text">Priya S. donated ₹500 to Food for All</div><div class="feed-time">2 min ago</div></div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:#d4860f;"></div>
+        <div><div class="feed-text">Sanitation drive completed in Kanpur East</div><div class="feed-time">1 hour ago</div></div>
+      </div>
+      <div class="feed-item">
+        <div class="feed-dot" style="background:#2e7d32;"></div>
+        <div><div class="feed-text">New intern Arjun K. joined the foundation</div><div class="feed-time">3 hours ago</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav">
+    <div class="navitem active" onclick="goTab('home')">
+      <i class="ti ti-home" aria-hidden="true"></i><span>Home</span>
+    </div>
+    <div class="navitem" onclick="goTab('causes')">
+      <i class="ti ti-heart" aria-hidden="true"></i><span>Causes</span>
+    </div>
+    <div class="navitem" onclick="goTab('donate')">
+      <i class="ti ti-currency-rupee" aria-hidden="true"></i><span>Donate</span>
+    </div>
+    <div class="navitem" onclick="goTab('volunteer')">
+      <i class="ti ti-users" aria-hidden="true"></i><span>Volunteer</span>
+    </div>
+    <div class="navitem" onclick="goTab('profile')">
+      <i class="ti ti-user" aria-hidden="true"></i><span>Profile</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3: CAUSES
+═══════════════════════════════════════ -->
+<div id="s-causes" class="screen" style="flex-direction:column;">
+  <div class="statusbar">
+    <span style="cursor:pointer;" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:14px;vertical-align:-2px;" aria-hidden="true"></i> Back</span>
+    <span>Our Causes</span>
+    <span></span>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+      <span class="badge badge-sky" style="cursor:pointer;white-space:nowrap;">All</span>
+      <span class="badge" style="background:var(--np-bg);color:var(--np-muted);cursor:pointer;white-space:nowrap;">Education</span>
+      <span class="badge" style="background:var(--np-bg);color:var(--np-muted);cursor:pointer;white-space:nowrap;">Nutrition</span>
+      <span class="badge" style="background:var(--np-bg);color:var(--np-muted);cursor:pointer;white-space:nowrap;">Health</span>
+      <span class="badge" style="background:var(--np-bg);color:var(--np-muted);cursor:pointer;white-space:nowrap;">Women</span>
+    </div>
+
+    <div id="causes-list">
+      <!-- Cause 1 -->
+      <div class="cause-card">
+        <div class="cause-img" style="background:#e8f4fd;"><i class="ti ti-book" style="font-size:42px;color:#1a6fa8;" aria-hidden="true"></i></div>
+        <div class="cause-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span class="card-title">Free Education Drive</span>
+            <span class="badge badge-sky">Education</span>
+          </div>
+          <p class="card-sub">Free tuition, books and stationery for underprivileged children in Uttar Pradesh.</p>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span style="font-size:12px;color:var(--np-muted);">Goal: ₹1,50,000</span>
+            <span style="font-size:12px;color:var(--np-sky);">62% funded</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:62%"></div></div>
+          <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="goTab('donate')">Donate now</button>
+        </div>
+      </div>
+      <!-- Cause 2 -->
+      <div class="cause-card">
+        <div class="cause-img" style="background:#fef3e2;"><i class="ti ti-apple" style="font-size:42px;color:#d4860f;" aria-hidden="true"></i></div>
+        <div class="cause-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span class="card-title">Food for All</span>
+            <span class="badge badge-gold">Nutrition</span>
+          </div>
+          <p class="card-sub">Daily meals for migrant workers, homeless individuals, and stray animals.</p>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span style="font-size:12px;color:var(--np-muted);">Goal: ₹80,000</span>
+            <span style="font-size:12px;color:var(--np-gold);">80% funded</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:80%;background:#d4860f;"></div></div>
+          <button class="btn-sm" style="margin-top:10px;width:100%;background:#d4860f;" onclick="goTab('donate')">Donate now</button>
+        </div>
+      </div>
+      <!-- Cause 3 -->
+      <div class="cause-card">
+        <div class="cause-img" style="background:#fdecea;"><i class="ti ti-heart-handshake" style="font-size:42px;color:#c0392b;" aria-hidden="true"></i></div>
+        <div class="cause-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span class="card-title">Women's Hygiene Program</span>
+            <span class="badge badge-coral">Women</span>
+          </div>
+          <p class="card-sub">Awareness campaigns and free sanitary napkin distribution for women in rural areas.</p>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span style="font-size:12px;color:var(--np-muted);">Goal: ₹60,000</span>
+            <span style="font-size:12px;color:var(--np-coral);">45% funded</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:45%;background:#c0392b;"></div></div>
+          <button class="btn-sm" style="margin-top:10px;width:100%;background:#c0392b;" onclick="goTab('donate')">Donate now</button>
+        </div>
+      </div>
+      <!-- Cause 4 -->
+      <div class="cause-card">
+        <div class="cause-img" style="background:#e8f5e9;"><i class="ti ti-shirt" style="font-size:42px;color:#2e7d32;" aria-hidden="true"></i></div>
+        <div class="cause-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span class="card-title">Clothing for the Poor</span>
+            <span class="badge badge-green">Welfare</span>
+          </div>
+          <p class="card-sub">Collecting and distributing clothing to poor families across Kanpur and nearby districts.</p>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span style="font-size:12px;color:var(--np-muted);">Goal: ₹40,000</span>
+            <span style="font-size:12px;color:var(--np-green);">55% funded</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:55%;background:#2e7d32;"></div></div>
+          <button class="btn-sm" style="margin-top:10px;width:100%;background:#2e7d32;" onclick="goTab('donate')">Donate now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="navitem" onclick="goTab('home')"><i class="ti ti-home" aria-hidden="true"></i><span>Home</span></div>
+    <div class="navitem active" onclick="goTab('causes')"><i class="ti ti-heart" aria-hidden="true"></i><span>Causes</span></div>
+    <div class="navitem" onclick="goTab('donate')"><i class="ti ti-currency-rupee" aria-hidden="true"></i><span>Donate</span></div>
+    <div class="navitem" onclick="goTab('volunteer')"><i class="ti ti-users" aria-hidden="true"></i><span>Volunteer</span></div>
+    <div class="navitem" onclick="goTab('profile')"><i class="ti ti-user" aria-hidden="true"></i><span>Profile</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 4: DONATE
+═══════════════════════════════════════ -->
+<div id="s-donate" class="screen" style="flex-direction:column;">
+  <div class="statusbar">
+    <span>NayePankh</span><span>Donate</span>
+  </div>
+  <div class="topbar" style="padding-bottom:12px;">
+    <h1>Make a donation</h1>
+    <p>100% of your contribution reaches the cause</p>
+  </div>
+  <div class="content">
+    <div class="card">
+      <p class="card-title" style="margin-bottom:10px;">Choose cause</p>
+      <div class="field" style="margin-bottom:0;">
+        <select id="donCause">
+          <option>Free Education Drive</option>
+          <option>Food for All</option>
+          <option>Women's Hygiene Program</option>
+          <option>Clothing for the Poor</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title" style="margin-bottom:12px;">Select amount</p>
+      <div class="amt-grid" id="amtGrid">
+        <div class="amt-opt selected" onclick="selectAmt(this,'100')">₹100</div>
+        <div class="amt-opt" onclick="selectAmt(this,'250')">₹250</div>
+        <div class="amt-opt" onclick="selectAmt(this,'500')">₹500</div>
+        <div class="amt-opt" onclick="selectAmt(this,'1000')">₹1,000</div>
+      </div>
+      <div class="field">
+        <label>Or enter custom amount (₹)</label>
+        <input type="number" id="customAmt" placeholder="e.g. 750" min="1"/>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title" style="margin-bottom:12px;">Donor details</p>
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="donName" placeholder="Your name"/>
+      </div>
+      <div class="field">
+        <label>PAN number (for 80G receipt)</label>
+        <input type="text" id="donPan" placeholder="ABCDE1234F" style="text-transform:uppercase;"/>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Message (optional)</label>
+        <textarea placeholder="A note of support..."></textarea>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--np-sky-light);border-color:var(--np-sky);">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <i class="ti ti-receipt-tax" style="font-size:22px;color:var(--np-sky);flex-shrink:0;margin-top:2px;" aria-hidden="true"></i>
+        <div>
+          <p style="font-size:13px;font-weight:500;color:var(--np-sky);">50% tax exemption under 80G</p>
+          <p style="font-size:12px;color:var(--np-sky);opacity:0.8;margin-top:3px;">Your donation is fully tax-exempted. Certificate will be emailed to you.</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="doDonate()" style="margin-bottom:20px;">
+      <i class="ti ti-lock" style="font-size:16px;vertical-align:-2px;margin-right:6px;" aria-hidden="true"></i>Proceed to pay
+    </button>
+  </div>
+  <div class="bottomnav">
+    <div class="navitem" onclick="goTab('home')"><i class="ti ti-home" aria-hidden="true"></i><span>Home</span></div>
+    <div class="navitem" onclick="goTab('causes')"><i class="ti ti-heart" aria-hidden="true"></i><span>Causes</span></div>
+    <div class="navitem active" onclick="goTab('donate')"><i class="ti ti-currency-rupee" aria-hidden="true"></i><span>Donate</span></div>
+    <div class="navitem" onclick="goTab('volunteer')"><i class="ti ti-users" aria-hidden="true"></i><span>Volunteer</span></div>
+    <div class="navitem" onclick="goTab('profile')"><i class="ti ti-user" aria-hidden="true"></i><span>Profile</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 5: VOLUNTEER
+═══════════════════════════════════════ -->
+<div id="s-volunteer" class="screen" style="flex-direction:column;">
+  <div class="statusbar"><span>NayePankh</span><span>Volunteer</span></div>
+  <div class="topbar" style="padding-bottom:12px;">
+    <h1>Volunteer portal</h1>
+    <p>Join a drive or track your hours</p>
+  </div>
+  <div class="content">
+    <div class="cert-card">
+      <p style="font-size:12px;opacity:0.75;margin-bottom:4px;">Your volunteer status</p>
+      <p style="font-size:20px;font-weight:500;" id="volName">Volunteer</p>
+      <div style="display:flex;gap:16px;margin-top:12px;">
+        <div><p style="font-size:18px;font-weight:500;" id="volHours">0</p><p style="font-size:11px;opacity:0.75;">Hours logged</p></div>
+        <div><p style="font-size:18px;font-weight:500;" id="volDrives">0</p><p style="font-size:11px;opacity:0.75;">Drives joined</p></div>
+        <div><p style="font-size:18px;font-weight:500;" id="volBadge">—</p><p style="font-size:11px;opacity:0.75;">Tier</p></div>
+      </div>
+    </div>
+
+    <div class="sec-hd">
+      <h3>Upcoming drives</h3>
+    </div>
+
+    <div class="card">
+      <div class="list-row">
+        <div class="icon-circle" style="background:var(--np-sky-light);"><i class="ti ti-book" style="font-size:20px;color:var(--np-sky);" aria-hidden="true"></i></div>
+        <div style="flex:1;">
+          <p style="font-size:13px;font-weight:500;color:var(--np-text);">Tuition camp — Kanpur</p>
+          <p style="font-size:11px;color:var(--np-muted);">Jun 18 · 9 AM–1 PM</p>
+        </div>
+        <button class="btn-sm" onclick="joinDrive(this,'Tuition camp')">Join</button>
+      </div>
+      <div class="list-row">
+        <div class="icon-circle" style="background:var(--np-gold-light);"><i class="ti ti-apple" style="font-size:20px;color:var(--np-gold);" aria-hidden="true"></i></div>
+        <div style="flex:1;">
+          <p style="font-size:13px;font-weight:500;color:var(--np-text);">Food distribution — Lucknow</p>
+          <p style="font-size:11px;color:var(--np-muted);">Jun 20 · 7 AM–10 AM</p>
+        </div>
+        <button class="btn-sm" onclick="joinDrive(this,'Food drive')" style="background:var(--np-gold);">Join</button>
+      </div>
+      <div class="list-row">
+        <div class="icon-circle" style="background:var(--np-coral-light);"><i class="ti ti-heart-handshake" style="font-size:20px;color:var(--np-coral);" aria-hidden="true"></i></div>
+        <div style="flex:1;">
+          <p style="font-size:13px;font-weight:500;color:var(--np-text);">Women's hygiene camp</p>
+          <p style="font-size:11px;color:var(--np-muted);">Jun 22 · 10 AM–3 PM</p>
+        </div>
+        <button class="btn-sm" onclick="joinDrive(this,'Hygiene camp')" style="background:var(--np-coral);">Join</button>
+      </div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:4px;">
+      <h3>Log volunteer hours</h3>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>Activity</label>
+        <select id="logActivity">
+          <option>Tuition camp</option>
+          <option>Food distribution</option>
+          <option>Hygiene camp</option>
+          <option>Clothing drive</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hours spent</label>
+        <input type="number" id="logHours" placeholder="e.g. 3" min="1" max="12"/>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Notes</label>
+        <textarea id="logNotes" placeholder="Brief description of what you did..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="logHours()" style="margin-top:12px;">Log hours</button>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="navitem" onclick="goTab('home')"><i class="ti ti-home" aria-hidden="true"></i><span>Home</span></div>
+    <div class="navitem" onclick="goTab('causes')"><i class="ti ti-heart" aria-hidden="true"></i><span>Causes</span></div>
+    <div class="navitem" onclick="goTab('donate')"><i class="ti ti-currency-rupee" aria-hidden="true"></i><span>Donate</span></div>
+    <div class="navitem active" onclick="goTab('volunteer')"><i class="ti ti-users" aria-hidden="true"></i><span>Volunteer</span></div>
+    <div class="navitem" onclick="goTab('profile')"><i class="ti ti-user" aria-hidden="true"></i><span>Profile</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 6: PROFILE
+═══════════════════════════════════════ -->
+<div id="s-profile" class="screen" style="flex-direction:column;">
+  <div class="statusbar"><span>NayePankh</span><span>Profile</span></div>
+  <div class="content" style="padding-top:20px;">
+    <!-- Profile header -->
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--np-sky-light);color:var(--np-sky);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:500;" id="profAvatar">V</div>
+      <h2 style="font-size:18px;font-weight:500;margin-top:10px;" id="profName">Volunteer</h2>
+      <p style="font-size:13px;color:var(--np-muted);" id="profEmail">—</p>
+      <span class="badge badge-green" style="margin-top:6px;" id="profTier">🌱 Seedling</span>
+    </div>
+
+    <!-- Impact snapshot -->
+    <div class="sec-hd"><h3>My impact</h3></div>
+    <div class="impact-row" style="margin-bottom:16px;">
+      <div class="impact-box"><div class="big" id="pTotalDon">₹0</div><div class="sm">Total donated</div></div>
+      <div class="impact-box"><div class="big" id="pVolHours">0 hrs</div><div class="sm">Hours volunteered</div></div>
+      <div class="impact-box"><div class="big" id="pDrives">0</div><div class="sm">Drives joined</div></div>
+      <div class="impact-box"><div class="big" id="pCerts">0</div><div class="sm">Certificates earned</div></div>
+    </div>
+
+    <!-- Certificate -->
+    <div class="cert-card" id="certCard" style="display:none;">
+      <p style="font-size:11px;opacity:0.7;">Certificate of recognition</p>
+      <p style="font-size:16px;font-weight:500;margin-top:4px;" id="certName">Name</p>
+      <p style="font-size:12px;opacity:0.75;margin-top:4px;">For dedicated service to the NayePankh Foundation</p>
+      <div style="margin-top:14px;display:flex;align-items:center;gap:8px;">
+        <i class="ti ti-award" style="font-size:20px;" aria-hidden="true"></i>
+        <span style="font-size:13px;opacity:0.85;">Issued June 2026 · UP Govt. Registered NGO</span>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="sec-hd"><h3>Donation history</h3></div>
+    <div class="card" style="padding:12px 16px;" id="donHistoryBox">
+      <p style="font-size:13px;color:var(--np-muted);text-align:center;padding:12px 0;">No donations yet. Every rupee counts!</p>
+    </div>
+
+    <!-- Settings rows -->
+    <div class="card" style="padding:0 16px;">
+      <div class="list-row" style="cursor:pointer;">
+        <i class="ti ti-bell" style="font-size:20px;color:var(--np-muted);" aria-hidden="true"></i>
+        <span style="flex:1;font-size:14px;color:var(--np-text);">Notifications</span>
+        <i class="ti ti-chevron-right" style="font-size:16px;color:var(--np-muted);" aria-hidden="true"></i>
+      </div>
+      <div class="list-row" style="cursor:pointer;">
+        <i class="ti ti-receipt-tax" style="font-size:20px;color:var(--np-muted);" aria-hidden="true"></i>
+        <span style="flex:1;font-size:14px;color:var(--np-text);">Tax certificates (80G)</span>
+        <i class="ti ti-chevron-right" style="font-size:16px;color:var(--np-muted);" aria-hidden="true"></i>
+      </div>
+      <div class="list-row" style="cursor:pointer;">
+        <i class="ti ti-share" style="font-size:20px;color:var(--np-muted);" aria-hidden="true"></i>
+        <span style="flex:1;font-size:14px;color:var(--np-text);">Share the foundation</span>
+        <i class="ti ti-chevron-right" style="font-size:16px;color:var(--np-muted);" aria-hidden="true"></i>
+      </div>
+      <div class="list-row" style="cursor:pointer;" onclick="doLogout()">
+        <i class="ti ti-logout" style="font-size:20px;color:var(--np-coral);" aria-hidden="true"></i>
+        <span style="flex:1;font-size:14px;color:var(--np-coral);">Sign out</span>
+      </div>
+    </div>
+
+    <p style="font-size:11px;color:var(--np-muted);text-align:center;margin:16px 0 24px;">
+      NayePankh Foundation · UP Govt. Registered · 80G &amp; 12A Certified<br/>Kanpur, India · nayepankh.com
+    </p>
+  </div>
+  <div class="bottomnav">
+    <div class="navitem" onclick="goTab('home')"><i class="ti ti-home" aria-hidden="true"></i><span>Home</span></div>
+    <div class="navitem" onclick="goTab('causes')"><i class="ti ti-heart" aria-hidden="true"></i><span>Causes</span></div>
+    <div class="navitem" onclick="goTab('donate')"><i class="ti ti-currency-rupee" aria-hidden="true"></i><span>Donate</span></div>
+    <div class="navitem" onclick="goTab('volunteer')"><i class="ti ti-users" aria-hidden="true"></i><span>Volunteer</span></div>
+    <div class="navitem active" onclick="goTab('profile')"><i class="ti ti-user" aria-hidden="true"></i><span>Profile</span></div>
+  </div>
+</div>
+
+</div><!-- /#app -->
+<div id="toast"></div>
+
+<script>
+var DB = {
+  user: null,
+  users: {
+    'rithi@example.com': {name:'Rithi', email:'rithi@example.com', city:'Coimbatore', pass:'password123', totalDon:0, volHours:0, drives:0, certs:0, history:[]}
+  }
+};
+var currentScreen = 's-splash';
+var historyStack = ['s-splash'];
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');}, 2500);
+}
+
+function goScreen(id){
+  document.getElementById(currentScreen).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  historyStack.push(id);
+  currentScreen = id;
+  refreshProfileUI();
+  refreshVolunteerUI();
+}
+
+function goBack(){
+  if(historyStack.length > 1){
+    historyStack.pop();
+    var prev = historyStack[historyStack.length-1];
+    document.getElementById(currentScreen).classList.remove('active');
+    document.getElementById(prev).classList.add('active');
+    currentScreen = prev;
+  }
+}
+
+var tabMap = {home:'s-home',causes:'s-causes',donate:'s-donate',volunteer:'s-volunteer',profile:'s-profile'};
+function goTab(tab){
+  goScreen(tabMap[tab]);
+}
+
+function authTab(which){
+  document.getElementById('tab-login').classList.toggle('active', which==='login');
+  document.getElementById('tab-register').classList.toggle('active', which==='register');
+  document.getElementById('form-login').style.display = which==='login'?'block':'none';
+  document.getElementById('form-register').style.display = which==='register'?'block':'none';
+}
+
+function doLogin(){
+  var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pass  = document.getElementById('loginPass').value;
+  var u = DB.users[email];
+  if(u && u.pass === pass){
+    DB.user = u;
+    document.getElementById('greetName').textContent = u.name;
+    goScreen('s-home');
+    showToast('Welcome back, '+u.name+'!');
+  } else {
+    showToast('Invalid credentials. Try again.');
+  }
+}
+
+function doRegister(){
+  var name  = document.getElementById('regName').value.trim();
+  var email = document.getElementById('regEmail').value.trim().toLowerCase();
+  var city  = document.getElementById('regCity').value.trim();
+  var pass  = document.getElementById('regPass').value;
+  if(!name||!email||!pass){ showToast('Please fill all fields.'); return; }
+  if(DB.users[email]){ showToast('Email already registered.'); return; }
+  DB.users[email] = {name:name, email:email, city:city, pass:pass, totalDon:0, volHours:0, drives:0, certs:0, history:[]};
+  DB.user = DB.users[email];
+  document.getElementById('greetName').textContent = name;
+  goScreen('s-home');
+  showToast('Account created! Welcome, '+name+'!');
+}
+
+function doLogout(){
+  DB.user = null;
+  goScreen('s-splash');
+  showToast('Signed out successfully.');
+}
+
+function selectAmt(el,val){
+  document.querySelectorAll('.amt-opt').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');
+  document.getElementById('customAmt').value = '';
+}
+
+function doDonate(){
+  var u = DB.user;
+  if(!u){ showToast('Please sign in first.'); return; }
+  var custom = document.getElementById('customAmt').value;
+  var selEl = document.querySelector('.amt-opt.selected');
+  var rawAmt = custom ? parseInt(custom) : (selEl ? parseInt(selEl.textContent.replace(/[^\d]/g,'')) : 0);
+  if(!rawAmt||rawAmt<1){ showToast('Please select or enter an amount.'); return; }
+  var cause = document.getElementById('donCause').value;
+  u.totalDon += rawAmt;
+  u.certs = Math.floor(u.totalDon / 500);
+  u.history.push({amt:rawAmt, cause:cause, date:'Jun 2026'});
+  showToast('Thank you! ₹'+rawAmt+' donated to '+cause+' 🙏');
+  refreshProfileUI();
+}
+
+function joinDrive(btn, name){
+  var u = DB.user;
+  if(!u){ showToast('Please sign in first.'); return; }
+  u.drives++;
+  btn.textContent = '✓ Joined';
+  btn.style.background = '#2e7d32';
+  btn.disabled = true;
+  showToast('Joined '+name+'! See you there.');
+  refreshVolunteerUI();
+}
+
+function logHours(){
+  var u = DB.user;
+  if(!u){ showToast('Please sign in first.'); return; }
+  var h = parseInt(document.getElementById('logHours').value)||0;
+  if(h<1){ showToast('Enter valid hours (min 1).'); return; }
+  u.volHours += h;
+  document.getElementById('logHours').value='';
+  document.getElementById('logNotes').value='';
+  showToast(h+' hours logged! Great work 🌟');
+  refreshVolunteerUI();
+}
+
+function getTier(hours){
+  if(hours >= 100) return '🏆 Champion';
+  if(hours >= 50)  return '🌟 Star';
+  if(hours >= 20)  return '🚀 Rising';
+  return '🌱 Seedling';
+}
+
+function refreshVolunteerUI(){
+  var u = DB.user;
+  if(!u) return;
+  document.getElementById('volName').textContent = u.name;
+  document.getElementById('volHours').textContent = u.volHours;
+  document.getElementById('volDrives').textContent = u.drives;
+  document.getElementById('volBadge').textContent = getTier(u.volHours);
+}
+
+function refreshProfileUI(){
+  var u = DB.user;
+  if(!u) return;
+  var initials = u.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  document.getElementById('profAvatar').textContent = initials;
+  document.getElementById('profName').textContent = u.name;
+  document.getElementById('profEmail').textContent = u.email + (u.city ? ' · '+u.city : '');
+  document.getElementById('profTier').textContent = getTier(u.volHours);
+  document.getElementById('pTotalDon').textContent = '₹'+u.totalDon;
+  document.getElementById('pVolHours').textContent = u.volHours+' hrs';
+  document.getElementById('pDrives').textContent = u.drives;
+  document.getElementById('pCerts').textContent = u.certs;
+  var cert = document.getElementById('certCard');
+  if(u.totalDon >= 500 || u.volHours >= 10){
+    cert.style.display = 'block';
+    document.getElementById('certName').textContent = u.name;
+  } else {
+    cert.style.display = 'none';
+  }
+  var hbox = document.getElementById('donHistoryBox');
+  if(u.history.length === 0){
+    hbox.innerHTML = '<p style="font-size:13px;color:var(--np-muted);text-align:center;padding:12px 0;">No donations yet. Every rupee counts!</p>';
+  } else {
+    hbox.innerHTML = u.history.slice().reverse().map(function(d){
+      return '<div class="list-row"><div class="icon-circle" style="background:var(--np-sky-light);"><i class="ti ti-receipt" style="font-size:18px;color:var(--np-sky);" aria-hidden="true"></i></div><div style="flex:1;"><p style="font-size:13px;font-weight:500;color:var(--np-text);">'+d.cause+'</p><p style="font-size:11px;color:var(--np-muted);">'+d.date+'</p></div><span style="font-size:14px;font-weight:500;color:var(--np-sky);">₹'+d.amt+'</span></div>';
+    }).join('');
+  }
+}
+</script>
